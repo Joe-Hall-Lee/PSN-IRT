@@ -23,6 +23,7 @@ python train.py \
 ```
 
 ## Citation
+```bibtex
 @misc{zhou2025lostbenchmarksrethinkinglarge,
       title={Lost in Benchmarks? Rethinking Large Language Model Benchmarking with Item Response Theory}, 
       author={Hongli Zhou and Hui Huang and Ziqing Zhao and Lvyuan Han and Huicheng Wang and Kehai Chen and Muyun Yang and Wei Bao and Jian Dong and Bing Xu and Conghui Zhu and Hailong Cao and Tiejun Zhao},
@@ -32,3 +33,4 @@ python train.py \
       primaryClass={cs.CL},
       url={https://arxiv.org/abs/2505.15055}, 
 }
+```
