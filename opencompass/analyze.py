@@ -31,8 +31,8 @@ except FileNotFoundError:
 # 定义参数
 n = 8
 datasets = [
-    "BBH",
     "HumanEval",
+    "BBH",
     "MMLU-Pro",
     "GPQA-Diamond",
 ]
@@ -97,7 +97,6 @@ for idx, dataset in enumerate(datasets):
         wrapped_names,
         ha="right",  # 右对齐
         va="center_baseline",
-        x=0.02,
         fontsize=12,
         weight="bold",
     )
@@ -158,7 +157,7 @@ plt.subplots_adjust(
     top=0.90, 
     bottom=0.10, 
     hspace=0.40, 
-    wspace=0.4, 
+    wspace=0.45, 
 )
 
 plt.savefig("intro-fig.png", bbox_inches="tight")
@@ -167,5 +166,5 @@ variances_df = variances_df.dropna()
 variances_df.to_csv("dataset_variances.csv")
 
 print(
-    "分析完成，图表已保存为intro-fig.png，方差结果保存为dataset_variances.csv"
+    "分析完成，图表已保存为 intro-fig.png，方差结果保存为dataset_variances.csv"
 )

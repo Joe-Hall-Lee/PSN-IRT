@@ -108,10 +108,12 @@ def main(learning_rate=0.003, weight_decay=0.0001, batch_size=512, max_epochs=30
     print(f"Using 4PL model with embeddings on device: {device}")
 
     # Load data
-    train_df = pd.read_csv("./combine.csv", header=None)
+    train_df = pd.read_csv("./data/combine.csv", header=None)
 
     num_students = len(train_df)
     num_items = len(train_df.columns)
+
+    print(f"Number of students: {num_students}, Number of items: {num_items}")
 
     # Create dataset and data loader
     train_dataset = IRTDataset(train_df)
@@ -162,7 +164,6 @@ def save_params(model, train_df, embedding_dim):
 
     # Get student abilities and embeddings
     student_abilities = torch.zeros(num_students, 1)
-    student_embeddings = torch.zeros(num_students, embedding_dim)
     with torch.no_grad():
         for sid in range(num_students):
             student_vec = torch.zeros(
@@ -171,18 +172,14 @@ def save_params(model, train_df, embedding_dim):
             embedding = model.student_net(student_vec)
             ability = model.student_ability_out(embedding)
             student_abilities[sid] = ability.cpu()
-            student_embeddings[sid] = embedding.squeeze().cpu()
     pd.DataFrame({
         "student_id": range(num_students),
         "ability": student_abilities.squeeze().numpy()
     }).to_csv("student_abilities.csv", index=False)
-    pd.DataFrame(student_embeddings.numpy()).to_csv(
-        "student_embeddings.csv", index=False)
-    print("Student parameters and embeddings saved.")
+    print("Student parameters saved.")
 
-    # Get item parameters and embeddings
+    # Get item parameters
     item_params = torch.zeros(num_items, 4)
-    item_embeddings = torch.zeros(num_items, embedding_dim)
     with torch.no_grad():
         for qid in range(num_items):
             item_vec = torch.zeros(num_items).float().unsqueeze(0).to(device)
@@ -190,16 +187,13 @@ def save_params(model, train_df, embedding_dim):
             embedding = model.item_net(item_vec)
             params = model.item_param_out(embedding)
             item_params[qid] = params.cpu()
-            item_embeddings[qid] = embedding.squeeze().cpu()
     item_param_df = pd.DataFrame(item_params.numpy(), columns=[
         "difficulty", "discrimination", "guessing", "feasibility"])
     item_param_df["guessing"] = 1 / \
         (1 + np.exp(-item_param_df["guessing"]))
     item_param_df["feasibility"] = 1 / \
         (1 + np.exp(-item_param_df["feasibility"]))
-    item_param_df.to_csv("item_parameters.csv", index=False)
-    pd.DataFrame(item_embeddings.numpy()).to_csv(
-        "item_embeddings.csv", index=False)
+    item_param_df.to_csv("results/item_parameters.csv", index=False)
     print("Item parameters and embeddings saved.")
 
 
