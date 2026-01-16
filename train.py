@@ -37,7 +37,7 @@ class IRT(nn.Module):
         self.hidden_dim = hidden_dim
         self.embedding_dim = embedding_dim
 
-        # Student ability network with embedding output
+        # Student ability network
         self.student_net = nn.Sequential(
             nn.Linear(num_students, hidden_dim),
             nn.ReLU(),
@@ -45,7 +45,7 @@ class IRT(nn.Module):
         )
         self.student_ability_out = nn.Linear(embedding_dim, 1)
 
-        # Item parameter network with embedding output
+        # Item parameter network
         self.item_net = nn.Sequential(
             nn.Linear(num_items, hidden_dim),
             nn.ReLU(),
@@ -108,7 +108,7 @@ def main(learning_rate=0.003, weight_decay=0.0001, batch_size=512, max_epochs=30
     print(f"Using 4PL model with embeddings on device: {device}")
 
     # Load data
-    train_df = pd.read_csv("./data/combine.csv", header=None)
+    train_df = pd.read_csv("./data/percent_0.7.csv", header=None)
 
     num_students = len(train_df)
     num_items = len(train_df.columns)
@@ -153,16 +153,16 @@ def main(learning_rate=0.003, weight_decay=0.0001, batch_size=512, max_epochs=30
         print(f"Epoch {epoch + 1}/{max_epochs}, Loss: {avg_loss:.4f}")
 
     # Save parameters and embeddings
-    save_params(model, train_df, embedding_dim)
+    save_params(model, train_df)
 
 # Parameter saving function
 
 
-def save_params(model, train_df, embedding_dim):
+def save_params(model, train_df):
     num_students = len(train_df)
     num_items = len(train_df.columns)
 
-    # Get student abilities and embeddings
+    # Get student abilities
     student_abilities = torch.zeros(num_students, 1)
     with torch.no_grad():
         for sid in range(num_students):
@@ -175,7 +175,7 @@ def save_params(model, train_df, embedding_dim):
     pd.DataFrame({
         "student_id": range(num_students),
         "ability": student_abilities.squeeze().numpy()
-    }).to_csv("student_abilities.csv", index=False)
+    }).to_csv("results/student_abilities_0.7.csv", index=False)
     print("Student parameters saved.")
 
     # Get item parameters
@@ -193,8 +193,8 @@ def save_params(model, train_df, embedding_dim):
         (1 + np.exp(-item_param_df["guessing"]))
     item_param_df["feasibility"] = 1 / \
         (1 + np.exp(-item_param_df["feasibility"]))
-    item_param_df.to_csv("results/item_parameters.csv", index=False)
-    print("Item parameters and embeddings saved.")
+    item_param_df.to_csv("results/item_parameters_0.7.csv", index=False)
+    print("Item parameters saved.")
 
 
 if __name__ == "__main__":
